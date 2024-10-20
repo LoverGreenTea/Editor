@@ -1,5 +1,38 @@
+import os
+from PIL import Image
+import folder
+from PIL.ImageQt import QPixmap
 from PyQt5.QtWidgets import *
 
+def pil2pixmap(im):
+    if im.mode == "RGB":
+        r, g, b = im.split()
+        im = Image.merge("RGB", (b, g, r))
+    elif im.mode == "RGBA":
+        r, g, b, a = im.split()
+        im = Image.merge("RGBA", (b, g, r, a))
+    elif im.mode == "L":
+        im = im.convert("RGBA")
+    im2 = im.convert("RGBA")
+    data = im2.tobytes("raw", "RGBA")
+    qim = QImage(data, im.size[0], im.size[1], QImage.Format_ARGB32)
+    pixmap = QPixmap.fromImage(qim)
+    return pixmap
+
+class PhotoManager:
+    def __init__(self):
+        self.photo = None
+        self.folder = None
+        self.filename = None
+
+    def Downloader_photo(self):
+        image_path = os.path.join(self.folder, self.filename)
+        self.photo = Image.open(image_path)
+
+    def show_photo(self, image_lbl):
+        pixels = pil2pixmap(self.photo)
+        pixels = pixels.scaledToWidth(500)
+        image_lbl.setPixmap(pixels)
 
 
 
@@ -17,7 +50,6 @@ app.setStyleSheet("""
             border-style: groove;
             border-color: #1A3636;
             border-width: 1px;
-            border=radius: 7px;
             border-radius: 5px;
             min-height: 30px;
             min-width: 100;
@@ -33,11 +65,11 @@ app.setStyleSheet("""
             border-color: #1A3636;
             border-width: 1px;
             border-radius: 7px;
+            color: #181C14;
             
         }
 
     """)
-
 
 v1 = QVBoxLayout()
 v2 = QVBoxLayout()
@@ -70,6 +102,16 @@ h3.addWidget(idk)
 
 v2.addLayout(h3)
 main_line.addLayout(v2)
+
+photo_manager = PhotoManager()
+def open_folder():
+    photo_manager.folder = QFileDialog.getExistingDirectory()
+    files = os.listdir(photo_manager.folder)
+    piclist.clear()
+    piclist.addItems(files)
+
+
+failbut.clicked.connect(open_folder)
 window.setLayout(main_line)
 window.show()
 app.exec_()
