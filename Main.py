@@ -1,7 +1,8 @@
 import os
 from PIL import Image
 import folder
-from PIL.ImageQt import QPixmap
+
+from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import *
 
 def pil2pixmap(im):
@@ -110,7 +111,12 @@ def open_folder():
     piclist.clear()
     piclist.addItems(files)
 
+def show_chosen_image():
+    photo_manager.filename = piclist.currentItem().text()
+    photo_manager.load()
+    photo_manager.show_photo(piclist)
 
+piclist.currentRowChanged.connect(show_chosen_image)
 failbut.clicked.connect(open_folder)
 window.setLayout(main_line)
 window.show()
