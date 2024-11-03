@@ -1,5 +1,5 @@
 import os
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageEnhance
 import folder
 
 from PyQt5.QtGui import QImage, QPixmap
@@ -24,6 +24,7 @@ def pil2pixmap(im):
 
 class PhotoManager:
     def __init__(self):
+        self.WhiteBlack = None
         self.photo = None
         self.folder = None
         self.filename = None
@@ -55,19 +56,28 @@ class PhotoManager:
         self.show_photo(self.image_lbl)
 
     def light(self, ):
-        self.photo = self.photo.ImageEnhance.Brightness(self.photo).enhance(1.5)
+        self.photo = ImageEnhance.Brightness(self.photo).enhance(1.5)
         self.show_photo(self.image_lbl)
 
     def idk(self, ):
-        self.photo = self.photo.ImageEnhance.Contrast(self.photo).enhance(1.5)
+        self.photo = ImageEnhance.Contrast(self.photo).enhance(1.5)
         self.show_photo(self.image_lbl)
 
     def Filter(self, ):
-        self.photo = self.photo.filter(ImageFilter.EMBOSS )
+        self.photo = self.photo.filter(ImageFilter.EMBOSS)
         self.show_photo(self.image_lbl)
 
     def Blur(self, ):
-        self.photo = self.photo.filter(ImageFilter.BoxBlur(20))
+        self.photo = self.photo.filter(ImageFilter.BLUR)
+        self.show_photo(self.image_lbl)
+
+    def White_Black(self, ):
+        self.photo = self.photo.convert("L")
+        edges = self.photo.filter(ImageFilter.FIND_EDGES)
+        self.show_photo(self.image_lbl)
+
+    def White(self, ):
+        self.photo = self.photo.filter(ImageFilter.CONTOUR)
         self.show_photo(self.image_lbl)
 
 app = QApplication([])
@@ -125,7 +135,7 @@ test1 = QPushButton("Контрастність")
 test2 = QPushButton("Філтер")
 test3 = QPushButton("блюр")
 test4 = QPushButton("Б/Ч")
-test5 = QPushButton("test")
+test5 = QPushButton("Накладення контурів")
 
 failbut = QPushButton("Папка")
 piclist = QListWidget()
@@ -179,7 +189,8 @@ mirror.clicked.connect(photo_manager.Mirror)
 test1.clicked.connect(photo_manager.idk)
 test2.clicked.connect(photo_manager.Filter)
 test3.clicked.connect(photo_manager.Blur)
-test4.clicked.connect(photo_manager.WhiteBlack)
+test4.clicked.connect(photo_manager.White_Black)
+test5.clicked.connect(photo_manager.White)
 
 failbut.clicked.connect(open_folder)
 window.setLayout(main_line)
